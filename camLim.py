@@ -83,7 +83,7 @@ def limpar_tela():
     st.session_state.captura_concluida = True
     st.session_state.recarregar = True
 
-@st.cache_data
+
 def contar_canhotos():
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -92,7 +92,7 @@ def contar_canhotos():
     conn.close()
     return quantidade
 
-@st.cache_data
+
 def consultar_canhoto(numero_nota):
     conn = conectar_banco()
     cursor = conn.cursor()
