@@ -16,6 +16,7 @@ from PIL import Image
 # Carregar variáveis do arquivo .env
 load_dotenv()
 
+@st.cache_resource
 def conectar_banco():
     conn_str = (
         f"DRIVER={{ODBC Driver 17 for SQL Server}};"
@@ -38,7 +39,7 @@ def validar_email(email):
     padrao_email = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     return re.match(padrao_email, email) is not None
 
-# Função para verificar duplicidade de nota fiscal
+@st.cache_data
 def verificar_nota_existente(nota_fiscal):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -80,6 +81,7 @@ def salvar_imagem_no_banco(imagem, nota_fiscal):
             (nota_fiscal, pyodbc.Binary(img_byte_arr), datetime.datetime.now())
         )
         conn.commit()
+        st.cache_data.clear()  # Limpa cache após salvar no banco
         st.success("Imagem salva com sucesso no banco de dados.")
     except Exception as e:
         st.error(f"Erro ao salvar imagem no banco de dados: {e}")
@@ -91,7 +93,7 @@ def limpar_tela():
     st.session_state.captura_concluida = True
     st.session_state.recarregar = True
 
-# Função para contar canhotos
+@st.cache_data
 def contar_canhotos():
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -100,7 +102,7 @@ def contar_canhotos():
     conn.close()
     return quantidade
 
-# Função para consultar o canhoto no banco de dados
+@st.cache_data
 def consultar_canhoto(numero_nota):
     conn = conectar_banco()
     cursor = conn.cursor()
@@ -141,8 +143,12 @@ def enviar_email_cpanel(destinatario, assunto, mensagem, imagem_bytes, nome_imag
     except Exception as e:
         st.error(f"Ocorreu um erro inesperado ao enviar o e-mail: {e}")
 
+# Carregar informações de cabeçalho
+with st.spinner("Carregando informações iniciais..."):
+    quantidade_canhotos = contar_canhotos()
+
 # Interface do Streamlit
-st.title("📌 Sistema de Captura e Consulta de Canhoto - Grupo Dinatec")
+st.title("📌 Sistema Captura e Consulta Canhoto - Grupo Dinatec")
 
 # Exibir logomarca no topo da página
 def exibir_logo(logo_path="logo.jpg"):
@@ -153,10 +159,10 @@ def exibir_logo(logo_path="logo.jpg"):
             st.image(logo, width=220)
     with col2:
         quantidade_canhotos = contar_canhotos()
-        st.markdown(f"<h3 style='text-align: center; font-weight:bold'>Empresa<br>Qtd. Canhotos:<br>🔗{quantidade_canhotos}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='text-align: center; font-weight:bold'>Qtd. Canhotos:<br>🔗{quantidade_canhotos}</h3>", unsafe_allow_html=True)
 
     with col3:
-        st.markdown(f"<h3 style='text-align: center; font-weight:bold'>Limeira<br></h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='text-align: center; font-weight:bold'>Empresa<br>Limeira<br></h3>", unsafe_allow_html=True)
 
 
 exibir_logo("logo.jpg")
