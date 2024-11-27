@@ -212,12 +212,45 @@ footer = """
     .main > div {
         padding-bottom: 150px; /* ajuste conforme necessário */
     }
-</style>
-<div class="footer">
-    Desenvolvido.: Panavarro | <a href="mailto:thiago@panavarro.com.br">Suporte</a>
-</div>
-"""
 
+    /* Estilização do botão flutuante do WhatsApp */
+    .whatsapp-button {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background-color: #25D366;
+        color: white;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: transform 0.3s;
+        text-decoration: none;
+        border: none;
+    }
+
+    .whatsapp-button:hover {
+        transform: scale(1.1);
+    }
+
+    .whatsapp-icon {
+        font-size: 36px;
+        color: white;
+    }
+</style>
+
+<div class="footer">
+    Desenvolvido.: 🛡️ <a href="https://www.panavarro.com.br" target="_blank">Panavarro</a> | 📩 <a href="mailto:thiago@panavarro.com.br">Suporte</a>
+</div>
+<a href="https://wa.me/5516993253920" target="_blank" class="whatsapp-button">
+    <i class="fab fa-whatsapp whatsapp-icon"></i>
+</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+"""
 # Exibir logomarca no topo da página
 exibir_logo("logo.jpg")
 
@@ -277,6 +310,8 @@ if pagina == "📸 Captura de Imagem":
                 if st.button("☑️ Salvar Imagem do Upload"):
                     with st.spinner("Salvando imagem..."):
                         salvar_imagem_no_banco(img_tratada, nota_fiscal)
+                        limpar_tela()
+                        streamlit_js_eval(js_expressions="parent.window.location.reload()")                        
 
     elif nota_fiscal:
         st.error("⚠️ Por favor, insira apenas números para o número da nota fiscal.")
